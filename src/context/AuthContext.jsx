@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/firebase/api";
 import { createContext, useContext, useEffect, useState } from "react";
-
+import { useLocation, useNavigate } from "react-router-dom";
 const INITIAL_USER = {
     id: "",
     name: "",
@@ -22,6 +22,9 @@ const AuthContext = createContext(INITIAL_STATE)
 const AuthProvider = ({children}) => {
     const [user, setUser] = useState(INITIAL_USER)
     const [isAuth, setIsAuth] = useState(false)
+
+    const {pathname} = useLocation()
+    const navigate = useNavigate()
 
     const checkAuth = async () => {
         const userData = await getCurrentUser()
@@ -46,7 +49,9 @@ const AuthProvider = ({children}) => {
     useEffect(() => {
         checkAuth()
 
-    },[isAuth])
+        if(!isAuth && pathname !== "/" && pathname !== "/about") navigate("/")
+    },[isAuth, pathname])
+
     return (
         <AuthContext.Provider value={{user, isAuth}}>
             {children}

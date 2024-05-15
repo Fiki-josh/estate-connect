@@ -1,9 +1,10 @@
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut} from 'firebase/auth'
+import {createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut} from 'firebase/auth'
 import { auth, db, storage } from './config'
 import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { isDifferenceInRange } from '../helpers'
 import emailjs from '@emailjs/browser';
+import { toast } from '@/components/ui/use-toast'
 
 export async function createNewUser(userData){
     const userRef = collection(db, "users")
@@ -88,6 +89,18 @@ export async function getCurrentUser(){
     return userData
 }
 
+async function uploadFile(file){
+
+    const storageRef = ref(storage, "images/apartments/otherImg" + file.name + Date.now())
+
+    const uploadImage = await uploadBytes(storageRef, file)
+
+    if(!uploadImage) return;
+        
+    const getImageUrl = await getDownloadURL(storageRef)
+
+    return getImageUrl
+}
 export async function uploadApartmentDetails(apartmentData){
     const apartmentRef = collection(db,"apartments")
 
@@ -100,6 +113,10 @@ export async function uploadApartmentDetails(apartmentData){
         if(!uploadImage) return;
         
         const getImageUrl = await getDownloadURL(storageRef)
+
+        const urls = await Promise.all(apartmentData.imgFiles.map(file => {
+            return uploadFile(file)
+        }))
         
         const apartmentOb = {
             apartmentType: apartmentData.apartmentType,
@@ -108,7 +125,8 @@ export async function uploadApartmentDetails(apartmentData){
             units: apartmentData.units,
             description: apartmentData.description,
             imgUrl: getImageUrl,
-            createdAt: new Date()
+            createdAt: new Date(),
+            urls
         }
         const apartment = await addDoc(apartmentRef, apartmentOb)
 
@@ -310,6 +328,100 @@ export async function updateApartment(apartmentData, apartmentId){
 
     try {
         await updateDoc(apartmentDoc, apartmentData)
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function resetPassword(email){
+
+    sendPasswordResetEmail(auth, email, {
+        url: "http://localhost:5173/"
+    }).then(() => {
+        toast({
+            title: "Email reset password sent",
+            description: "An email as been sent to you, to reset your password"
+        })
+    }).catch((error) => console.error(error))
+}
+
+export async function sendFeedback(data){
+    try {
+        const send_email = {
+            to_name: data.name,
+            from_email: data.email,
+            message: data.message
+        }
+
+        const email = await emailjs.send(import.meta.env.VITE_EMAILJS_SERVICE_ID, import.meta.env.VITE_EMAILJS_TEMPLATE_ID, send_email, import.meta.env.VITE_EMAILJS_USER_ID)
+
+        return email.text
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function getApartment(id){
+    const apartmentsRef = collection(db, "apartments")
+
+    const apartmentDoc = doc(apartmentsRef, id)
+
+    try {
+        const docSnapshot = await getDoc(apartmentDoc)
+
+        if(!docSnapshot.exists()) return;
+
+        return {...docSnapshot.data(), id: docSnapshot.id}
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function signInAdmin(userData){
+    const usersRef = collection(db,"users")
+
+    const q = query(
+        usersRef,
+        where("isAdmin", "==", true)
+    )
+
+    try {
+        const querySnapShot = await getDocs(q)
+
+        if(querySnapShot.empty) return;
+
+        let isAdmin = false;
+
+        for (const doc_ of querySnapShot.docs){
+            const docData = doc_.data()
+            if(userData.email == docData.email && docData.isAdmin){
+                await signInWithEmailAndPassword(
+                    auth,
+                    userData.email,
+                    userData.password
+                )
+
+                isAdmin = true
+
+                break;
+            }
+        }
+        console.log("Testing 1")
+        if(!isAdmin){
+            console.log("Testing 2")
+            return toast({
+                title: "Error",
+                description: "The details supplied did not match an admin"
+            })
+        }
+        else{
+            console.log("Testing 3")
+            window.location.reload()
+            return toast({
+                title: "Success",
+                description: "Successfuly signed in admin"
+            })
+        }
     } catch (error) {
         console.error(error)
     }

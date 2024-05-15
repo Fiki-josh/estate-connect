@@ -11,14 +11,14 @@ import NavBar from './components/shared/NavBar.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <ErrorBoundary FallbackComponent={ErrorFallBack}>
           <NavBar />
           <App />
           <Toaster />
         </ErrorBoundary>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   </React.StrictMode>,
 )

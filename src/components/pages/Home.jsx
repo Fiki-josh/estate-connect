@@ -9,6 +9,7 @@ import {
     DialogContent,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Link } from 'react-router-dom'
 
 const Home = () => {
     const {isAuth, user} = useUserContext()
@@ -59,7 +60,7 @@ function Apartmentpost({apartment}){
     const [isEditLoading, setIsEditLoading] = useState(false)
     const [apartmentData, setApartmentData] = useState(apartment)
  
-    const isMatching = apartment.isMatching ? apartment.isMatching.includes(user.id) : false
+    const isMatching = apartment?.isMatching ? apartment?.isMatching.includes(user.id) : false
 
     const handleGetMatched = async(apartmentId, apartmentUnit) => {
         const userData = {
@@ -180,16 +181,23 @@ function Apartmentpost({apartment}){
             <p className=''>Available Units: {apartment.units}</p>
             <p>{apartment.description}</p>
 
-            {
-                (isAuth && apartment.units !== 0) 
-                &&  
-                <Button 
-                    onClick = {() => handleGetMatched(apartment.id, apartment.units)}
-                    disabled = {isMatching}
-                >
-                    {isMatchedLoading ? <Loader2 className='animate-spin' /> : "Get matched"}
-                </Button>
-            }
+            <section className='flex justify-between flex-wrap'>
+                {
+                    (isAuth && apartment.units !== 0) 
+                    &&  
+                    <Button 
+                        onClick = {() => handleGetMatched(apartment.id, apartment.units)}
+                        disabled = {isMatching}
+                    >
+                        {isMatchedLoading ? <Loader2 className='animate-spin' /> : "Get matched"}
+                    </Button>
+                }
+
+                <Link to={`/apartment/${apartment.id}`}>
+                    <Button>View Details</Button>
+                </Link>
+            </section>
+
         </div>
     )
 }

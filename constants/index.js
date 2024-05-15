@@ -10,7 +10,15 @@ export const adminNavLinks = [
     {
         link: "Create-Apartment",
         to: "/create"
-    }
+    },
+    {
+        link: "About-Us",
+        to: "/about"
+    },
+    {
+        link: "Feedback",
+        to: "/feedback"
+    },
 ]
 export const navLinks = [
     {
@@ -20,5 +28,13 @@ export const navLinks = [
     {
         link: "Profile",
         to: "/profile"
-    }
+    },
+    {
+        link: "About-Us",
+        to: "/about"
+    },
+    {
+        link: "Feedback",
+        to: "/feedback"
+    },
 ]

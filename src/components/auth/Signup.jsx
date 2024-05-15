@@ -10,7 +10,7 @@ import { createNewUser } from '@/lib/firebase/api'
 import { Loader2 } from 'lucide-react'
 import { getCurrentDate } from '@/lib/helpers'
 
-const Signup = ({setAcct}) => {
+const Signup = ({setAcct, setAdmin}) => {
     const [userData, setUserData] = useState({})
     const [disabled, setDisabled] = useState(true)
     const [loading, setLoading] = useState(false)
@@ -131,6 +131,20 @@ const Signup = ({setAcct}) => {
                 className='text-sm'
             >
                 Already have and account? <span className=' text-blue-400 cursor-pointer' onClick={() => setAcct(true)}>Login</span>
+            </p>
+            <p 
+                className='text-sm flex gap-1'
+            >
+                Already have and account? 
+                <span 
+                    className=' text-blue-400 cursor-pointer' 
+                    onClick={() => {
+                        setAcct(true)
+                        setAdmin(true)
+                    }}
+                >
+                    Admin Login
+                </span>
             </p>
         </form>
     </ScrollArea>

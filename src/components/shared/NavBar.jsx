@@ -14,11 +14,15 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { LogOut } from 'lucide-react'
 import { handleSignOut } from '@/lib/firebase/api'
 import { toast } from '../ui/use-toast'
+import ForgotPassword from '../auth/ForgotPassword'
+import AdminSignin from '../auth/AdminSignin'
   
 
 const NavBar = () => {
     const [toggle, setToggle] = useState(false)
     const [acct, setAcct] = useState(false)
+    const [forgot, setForgot] = useState(false)
+    const [admin, setAdmin] = useState(false)
 
     const {pathname} = useLocation()
     const {user, isAuth} = useUserContext()
@@ -41,7 +45,14 @@ const NavBar = () => {
             <DialogContent>
                 <ErrorBoundary fallback={<>Something went wrong</>}>
                     {
-                        !acct ? <Signup setAcct={setAcct} /> : <SignIn setAcct={setAcct} />
+                        !acct 
+                        ? 
+                        <Signup setAcct={setAcct} setAdmin={setAdmin} /> 
+                        : forgot 
+                        ? <ForgotPassword setForgot={setForgot} /> 
+                        : admin 
+                        ? <AdminSignin setAdmin={setAdmin} setForgot={setForgot} /> 
+                        :<SignIn setAcct={setAcct} setForgot={setForgot} />
                     }
                 </ErrorBoundary>
             </DialogContent>

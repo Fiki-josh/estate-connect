@@ -18,6 +18,7 @@ const CreateApartment = () => {
         if(!user.isAdmin){
             navigate("/")
         }
+        console.log(apartmentData)
     },[apartmentData])
 
     const handleSubmit = async(e) => {
@@ -88,7 +89,7 @@ const CreateApartment = () => {
             required
         />
         <div className='space-y-4'>
-            <label htmlFor="upload-image" className='font-medium text-md'>Upload Image:</label>
+            <label htmlFor="upload-image" className='font-medium text-md'>Upload Image Thumbnails:</label>
             <input 
                 type='file' 
                 placeholder='' 
@@ -97,6 +98,19 @@ const CreateApartment = () => {
                 id='upload-image'  
                 onChange={(e) => setApartmentData({...apartmentData, imgFile: e.target.files[0]})}
                 required
+            />
+        </div>
+        <div className='space-y-4'>
+            <label htmlFor="upload-images" className='font-medium text-md'>Upload Other Images:</label>
+            <input 
+                type='file' 
+                placeholder='' 
+                accept='.jpg,.png,.jpeg,.svg'
+                className='w-full p-3 border outline-none rounded'
+                id='upload-images'  
+                onChange={(e) => setApartmentData({...apartmentData, imgFiles: Array.from(e.target.files)})}
+                required
+                multiple
             />
         </div>
         <Button type='submit'>{isLoading ? <Loader2 className='animate-spin' /> : "Submit"}</Button>

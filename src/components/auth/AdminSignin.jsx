@@ -1,10 +1,10 @@
 import React,{useEffect, useState} from 'react'
 import { Button } from "@/components/ui/button"
-import { signInUser } from '@/lib/firebase/api'
 import { toast } from '../ui/use-toast'
 import { Loader2 } from 'lucide-react'
+import { signInAdmin } from '@/lib/firebase/api'
 
-const SignIn = ({setAcct, setForgot}) => {
+const AdminSignin = ({setAdmin, setForgot}) => {
     const [userData, setUserData] = useState({})
     const [disabled, setDisabled] = useState(true)
     const [loading, setLoading] = useState(false)
@@ -24,21 +24,9 @@ const SignIn = ({setAcct, setForgot}) => {
   async function onSubmit() {
     setLoading(true)
     
-    const {isSuccess, isError, errorMsg} = await signInUser(userData.email, userData.password)
+    await signInAdmin(userData)
 
-    if(isSuccess){
-        setLoading(false)
-        window.location.reload()
-        return toast({
-            description: "Success"
-        })
-    }
-    else if(isError){
-        setLoading(false)
-        return toast({
-            description: errorMsg
-        })
-    }
+    setLoading(false)
   }
   return (
     
@@ -49,9 +37,9 @@ const SignIn = ({setAcct, setForgot}) => {
         }} 
         className='py-2 space-y-3'
     >
-        <h1 className='font-bold text-2xl'>Log into your account</h1>
-        <input type='email' placeholder='Email' className='w-full p-3 border outline-none rounded' onChange={(e) => setUserData({...userData, email: e.target.value})} />
-        <input type='password' placeholder='password' className='w-full p-3 border outline-none rounded' onChange={(e) => setUserData({...userData, password: e.target.value})} />
+        <h1 className='font-bold text-2xl'>Admin Login</h1>
+        <input type='email' placeholder='Email' required className='w-full p-3 border outline-none rounded' onChange={(e) => setUserData({...userData, email: e.target.value})} />
+        <input type='password' placeholder='password' required className='w-full p-3 border outline-none rounded' onChange={(e) => setUserData({...userData, password: e.target.value})} />
         
         <p 
             className=' float-right text-blue-400 cursor-pointer'
@@ -60,9 +48,9 @@ const SignIn = ({setAcct, setForgot}) => {
             Forgotten password
         </p>
         <Button className="w-full" disabled={disabled}>{loading ? <Loader2 className='animate-spin' /> : "Submit"}</Button>
-        <p>Don't have an account? <span className=' text-blue-400 cursor-pointer' onClick={() => setAcct(false)}>Signup</span></p>
+        <p>Back to user login <span className=' text-blue-400 cursor-pointer' onClick={() => setAdmin(false)}>Back</span></p>
     </form>
   )
 }
 
-export default SignIn
+export default AdminSignin
